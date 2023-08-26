@@ -1,0 +1,52 @@
+run:
+  timeout: 5m
+
+linters:
+  enable:
+    - megacheck
+    - godox
+    - goconst
+    - whitespace
+    - stylecheck
+    - revive
+    - misspell
+    - depguard
+  disable:
+    - scopelint
+    - maligned
+    - gci
+  presets:
+    - bugs # asciicheck, bidichk, bodyclose, contextcheck, durationcheck, errcheck, errchkjson, errorlint, exhaustive, exportloopref, gosec, govet, makezero, nilerr, noctx, rowserrcheck, scopelint, sqlclosecheck, staticcheck, typecheck
+    - complexity # cyclop, funlen, gocognit, gocyclo, maintidx, nestif
+    - format # decorder, gci, gofmt, gofumpt, goimports
+    - performance # bodyclose, maligned, noctx, prealloc
+    - unused # deadcode, ineffassign, structcheck, unparam, unused, varcheck
+  fast: false
+
+# configuration for specific linters
+linters-settings:
+  funlen:
+    lines: 80
+  cyclop:
+    max-complexity: 12
+    skip-tests: true
+  nakedret:
+    max-func-lines: 0 # no naked returns
+  goimports:
+    # put imports beginning with prefix after 3rd-party packages;
+    # it's a comma-separated list of prefixes
+    local-prefixes: github.com/kyleshepherd/mr-menubar
+  depguard:
+    list-type: blacklist
+    include-go-root: false
+    packages:
+      - github.com/satori/go.uuid
+    packages-with-error-message:
+      - github.com/satori/go.uuid: "Unsafe package, prefer github.com/gofrs/uuid"
+
+issues:
+  exclude-rules:
+    - path: '(.+)_test\.go'
+      linters:
+        - funlen
+        - gocyclo
