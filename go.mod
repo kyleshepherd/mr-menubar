@@ -1,7 +1,9 @@
 module github.com/kyleshepherd/mr-menubar
 
+go 1.20
+
 require (
-	github.com/rs/zerolog v1.11.0
-	github.com/spf13/cobra v0.0.3
-	go.soon.build/kit/config v0.0.0-20210812141405-28d18278434a
+	github.com/caseymrm/askm v1.0.0 // indirect
+	github.com/caseymrm/menuet v1.0.1 // indirect
+	github.com/joho/godotenv v1.5.1 // indirect
 )
