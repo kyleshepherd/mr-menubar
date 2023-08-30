@@ -13,7 +13,11 @@ These steps will describe how to setup this project for active development. Adju
 
 1. Clone the repository: `git clone git@github.com:kyleshepherd/mr-menubar.git mr-menubar`
 2. Build: `make`
-3. 🍻
+3. Copy built `MRBar.app` to Applications folder
+4. In Applications, double-click MRBar to open
+5. Click Gitlab icon in menu bar
+6. Click "Set Token" in menu
+7. Enter your Gitlab Access Token (must have `read_api` scope at minimum)
 
 ### Dependencies
 
@@ -25,10 +29,3 @@ To add a dependency:
 ```
 go get url/to/origin
 ```
-
-### Configuration
-
-Configuration can be provided through a env file:
-| **Name** | **Use** | **Example** | **Required?** |
-|--------------|------------------------------------------------------|---------------------|---------------|
-| GITLAB_TOKEN | Used for GraphQL requests to Gitlab to fetch MR info | `glpat-XXXXXXXXXXX` | Y |

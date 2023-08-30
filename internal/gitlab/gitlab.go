@@ -7,8 +7,6 @@ import (
 	"io"
 	"net/http"
 	"time"
-
-	"github.com/kyleshepherd/mr-menubar/internal/env"
 )
 
 type Response struct {
@@ -27,7 +25,7 @@ type MRs struct {
 	} `json:"reviewRequestedMergeRequests"`
 }
 
-func GetMRs() (*MRs, error) {
+func GetMRs(token string) (*MRs, error) {
 	queryMap := map[string]string{
 		"query": `
 			{
@@ -54,11 +52,7 @@ func GetMRs() (*MRs, error) {
 		return nil, fmt.Errorf("error creating request %v", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
-	gitToken, err := env.GetEnvVar("GITLAB_TOKEN")
-	if err != nil {
-		return nil, fmt.Errorf("error getting Gitlab Token %v", err)
-	}
-	req.Header.Set("Authorization", "Bearer "+gitToken)
+	req.Header.Set("Authorization", "Bearer "+token)
 
 	client := &http.Client{Timeout: time.Second * 5}
 	res, err := client.Do(req)
