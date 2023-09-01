@@ -13,7 +13,7 @@ These steps will describe how to setup this project for active development. Adju
 
 1. Clone the repository: `git clone git@github.com:kyleshepherd/mr-menubar.git mr-menubar`
 2. Build: `make`
-3. Run `cp -R MRBar.app/ /Applications/`
+3. Run `cp -R MRBar.app /Applications/`
 4. In Applications, double-click MRBar to open
 5. Click Gitlab icon in menu bar
 6. Click "Set Token" in menu
