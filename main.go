@@ -15,29 +15,32 @@ import (
 var username string
 
 func main() {
-	go runMenuApp()
+	go loopUpdate()
 	menuet.App().Label = "com.github.kyleshepherd.mrbar"
 	menuet.App().Children = menuItems
 	menuet.App().RunApplication()
 }
 
-func runMenuApp() {
+func loopUpdate() {
 	for {
-		token := menuet.Defaults().String("gitlab_token")
-		if token == "" {
-			updateState(nil)
-		} else {
-			mrs, err := gitlab.GetMRs(token)
-			if err != nil {
-				handleError(err)
-				updateState(nil)
-				return
-			}
-			username = mrs.Username
-			updateState(mrs)
-		}
+		update()
 		time.Sleep(time.Second * 60)
 	}
+}
+
+func update() {
+	token := menuet.Defaults().String("gitlab_token")
+	if token == "" {
+		updateState(nil)
+		return
+	}
+	mrs, err := gitlab.GetMRs(token)
+	if err != nil {
+		handleError(err)
+		return
+	}
+	username = mrs.Username
+	updateState(mrs)
 }
 
 func updateState(mrs *gitlab.MRs) {
@@ -54,46 +57,54 @@ func updateState(mrs *gitlab.MRs) {
 }
 
 func menuItems() []menuet.MenuItem {
-	browserItem := menuet.MenuItem{
-		Text: "Open in Browser",
-		Clicked: func() {
-			err := openBrowser("https://gitlab.com/dashboard/merge_requests?assignee_username=" + username)
-			if err != nil {
-				handleError(err)
-				return
-			}
-			err = openBrowser("https://gitlab.com/dashboard/merge_requests?reviewer_username=" + username)
-			if err != nil {
-				handleError(err)
-				return
-			}
+	userItems := []menuet.MenuItem{
+		{
+			Text: "Open in Browser",
+			Clicked: func() {
+				err := openBrowser("https://gitlab.com/dashboard/merge_requests?assignee_username=" + username)
+				if err != nil {
+					handleError(err)
+					return
+				}
+				err = openBrowser("https://gitlab.com/dashboard/merge_requests?reviewer_username=" + username)
+				if err != nil {
+					handleError(err)
+					return
+				}
+			},
 		},
 	}
 
-	tokenItem := menuet.MenuItem{
-		Text: "Set Token",
-		Clicked: func() {
-			tokenRes := menuet.App().Alert(menuet.Alert{
-				MessageText:     "Set Token",
-				InformativeText: "Enter your Gitlab Token below",
-				Inputs:          []string{"Token"},
-				Buttons:         []string{"Save", "Cancel"},
-			})
-			if tokenRes.Button != 0 {
-				return
-			}
-			menuet.Defaults().SetString("gitlab_token", tokenRes.Inputs[0])
+	nonUserItems := []menuet.MenuItem{
+		{
+			Text: "Refresh",
+			Clicked: func() {
+				update()
+			},
+		},
+		{
+			Text: "Set Token",
+			Clicked: func() {
+				tokenRes := menuet.App().Alert(menuet.Alert{
+					MessageText:     "Set Token",
+					InformativeText: "Enter your Gitlab Token below",
+					Inputs:          []string{"Token"},
+					Buttons:         []string{"Save", "Cancel"},
+				})
+				if tokenRes.Button != 0 {
+					return
+				}
+				menuet.Defaults().SetString("gitlab_token", tokenRes.Inputs[0])
+				update()
+			},
 		},
 	}
 
 	if username == "" {
-		return []menuet.MenuItem{tokenItem}
+		return nonUserItems
 	}
 
-	return []menuet.MenuItem{
-		browserItem,
-		tokenItem,
-	}
+	return append(userItems, nonUserItems...)
 }
 
 func openBrowser(url string) error {
@@ -117,5 +128,4 @@ func openBrowser(url string) error {
 
 func handleError(err error) {
 	fmt.Println(err)
-	menuet.App().Alert(menuet.Alert{MessageText: "Error", InformativeText: err.Error()})
 }
